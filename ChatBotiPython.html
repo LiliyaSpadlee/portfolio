@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Создание чат-ботов на Python</title>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-light: #e8f4fd;
+    --blue-mid: #5ba3d9;
+    --blue-dark: #1a6fa8;
+    --blue-accent: #2196f3;
+    --gray-100: #f5f7f9;
+    --gray-200: #e2e6ea;
+    --gray-400: #9ca3af;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--white);
+    color: var(--gray-900);
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--blue-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-logo span { color: var(--blue-accent); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--gray-700);
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--blue-accent); }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #e8f4fd 0%, #c8e6f5 50%, #a8d5ec 100%);
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 320px; height: 320px;
+    background: rgba(33,150,243,0.08);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 240px; height: 240px;
+    background: rgba(26,111,168,0.06);
+    border-radius: 50%;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--blue-accent);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--blue-dark);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero h1 em { color: var(--blue-accent); font-style: normal; }
+  .hero p {
+    font-size: 1.1rem;
+    color: var(--gray-700);
+    max-width: 540px;
+    margin: 0 auto 2rem;
+  }
+  .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--blue-accent);
+    color: white;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+  .btn-secondary {
+    background: white;
+    color: var(--blue-accent);
+    padding: 12px 28px;
+    border-radius: 8px;
+    border: 2px solid var(--blue-accent);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { background: var(--blue-light); }
+
+  /* STATS */
+  .stats {
+    background: var(--blue-dark);
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; color: white; }
+  .stat-num { font-family: 'Montserrat', sans-serif; font-size: 2rem; font-weight: 800; }
+  .stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+  /* SECTIONS */
+  section { padding: 4rem 2rem; max-width: 1000px; margin: 0 auto; }
+  .section-header { text-align: center; margin-bottom: 3rem; }
+  .section-tag {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--blue-accent);
+    margin-bottom: 0.5rem;
+  }
+  h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--gray-900);
+    margin-bottom: 0.75rem;
+  }
+  .section-sub { color: var(--gray-400); font-size: 1rem; max-width: 500px; margin: 0 auto; }
+
+  /* MODULES */
+  .modules-grid { display: flex; flex-direction: column; gap: 10px; }
+  .module-card {
+    background: var(--white);
+    border: 1.5px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    align-items: center;
+    gap: 1rem;
+  }
+  .module-card:hover { border-color: var(--blue-mid); background: var(--blue-light); }
+  .module-card .module-card-content { display: flex; flex-direction: column; gap: 6px; }
+  .module-num {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--blue-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+  .module-card h3 { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 700; margin: 0; color: var(--gray-900); }
+  .module-card p { display: none; }
+  .module-card-arrow { color: var(--gray-400); font-size: 1.1rem; flex-shrink: 0; }
+  .module-topics { display: flex; flex-wrap: wrap; gap: 6px; }
+  .topic-tag {
+    background: var(--blue-light);
+    color: var(--blue-dark);
+    font-size: 0.72rem;
+    padding: 2px 9px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+
+  /* LESSON PAGE */
+  .lesson-content { display: none; }
+  .lesson-content.active { display: block; }
+  .lesson-nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--gray-200);
+    padding-bottom: 0;
+  }
+  .lesson-tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--gray-400);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.2s, border-color 0.2s;
+    border: none;
+    background: none;
+  }
+  .lesson-tab.active { color: var(--blue-accent); border-bottom-color: var(--blue-accent); }
+  .lesson-tab:hover { color: var(--blue-dark); }
+  .lesson-pane { display: none; }
+  .lesson-pane.active { display: block; }
+
+  /* CODE EDITOR */
+  #code-section { background: var(--gray-100); padding: 4rem 2rem; }
+  .editor-container { max-width: 900px; margin: 0 auto; }
+  .editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1e2d3d;
+    border-radius: 10px 10px 0 0;
+    padding: 12px 1rem;
+  }
+  .editor-dots { display: flex; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .editor-title { font-family: 'Montserrat', sans-serif; font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+  #code-editor {
+    width: 100%;
+    min-height: 200px;
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    padding: 1.5rem;
+    border: none;
+    resize: vertical;
+    outline: none;
+  }
+  .editor-footer {
+    background: #161b22;
+    border-radius: 0 0 10px 10px;
+    padding: 12px 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .btn-run {
+    background: #2ea043;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-run:hover { background: #3fb950; }
+  .btn-reset {
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-reset:hover { border-color: rgba(255,255,255,0.4); color: white; }
+  #code-output {
+    background: #0d1117;
+    color: #3fb950;
+    font-family: 'Courier New', monospace;
+    font-size: 0.88rem;
+    padding: 1rem 1.5rem;
+    margin-top: 1rem;
+    border-radius: 8px;
+    min-height: 60px;
+    border: 1px solid #21262d;
+    display: none;
+    white-space: pre-wrap;
+  }
+  .exercises-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 2rem; }
+  .exercise-card {
+    background: white;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .exercise-card:hover { border-color: var(--blue-mid); }
+  .exercise-card h4 { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .exercise-card p { font-size: 0.85rem; color: var(--gray-400); }
+  .diff-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+  }
+  .diff-easy { background: #d1fae5; color: #065f46; }
+  .diff-medium { background: #fef3c7; color: #92400e; }
+  .diff-hard { background: #fee2e2; color: #991b1b; }
+
+  /* QUIZ */
+  #quiz-section { background: white; }
+  .quiz-wrapper { max-width: 700px; margin: 0 auto; }
+  .quiz-progress {
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: 3px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .quiz-bar {
+    height: 100%;
+    background: var(--blue-accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+  .quiz-question {
+    background: var(--gray-100);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .q-num { font-size: 0.8rem; color: var(--gray-400); font-family: 'Montserrat', sans-serif; font-weight: 600; margin-bottom: 0.75rem; }
+  .q-text { font-size: 1.05rem; font-weight: 700; font-family: 'Montserrat', sans-serif; color: var(--gray-900); margin-bottom: 1.5rem; }
+  .q-options { display: flex; flex-direction: column; gap: 0.75rem; }
+  .q-option {
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .q-option:hover { border-color: var(--blue-mid); background: var(--blue-light); }
+  .q-option.correct { border-color: #10b981; background: #d1fae5; color: #065f46; }
+  .q-option.wrong { border-color: #ef4444; background: #fee2e2; color: #991b1b; }
+  .q-option.disabled { pointer-events: none; }
+  .option-letter {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    flex-shrink: 0;
+  }
+  .q-feedback {
+    margin-top: 1rem;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .q-feedback.show { display: block; }
+  .q-feedback.correct-fb { background: #d1fae5; color: #065f46; }
+  .q-feedback.wrong-fb { background: #fee2e2; color: #991b1b; }
+  .quiz-result {
+    text-align: center;
+    padding: 3rem;
+    background: var(--blue-light);
+    border-radius: 16px;
+    display: none;
+  }
+  .quiz-result.show { display: block; }
+  .result-score { font-family: 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 800; color: var(--blue-dark); }
+  .result-label { color: var(--gray-700); margin-top: 0.5rem; }
+
+  /* VIDEO */
+  #video-section { background: var(--gray-100); }
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+  .video-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1.5px solid var(--gray-200);
+    transition: transform 0.2s;
+  }
+  .video-card:hover { transform: translateY(-4px); }
+  .video-thumb {
+    aspect-ratio: 16/9;
+    background: var(--blue-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+  }
+  .play-btn {
+    width: 56px; height: 56px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s;
+  }
+  .play-btn svg { margin-left: 4px; }
+  .video-thumb:hover .play-btn { transform: scale(1.1); }
+  .video-info { padding: 1rem; }
+  .video-info h4 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 0.3rem; }
+  .video-info p { font-size: 0.82rem; color: var(--gray-400); }
+  .video-dur {
+    position: absolute; bottom: 8px; right: 10px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+  }
+  .thumb-bg {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--gray-900);
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.85rem;
+  }
+  footer strong { color: white; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--gray-100); }
+  ::-webkit-scrollbar-thumb { background: var(--blue-mid); border-radius: 3px; }
+
+  /* MODULE MODAL */
+  .module-card { cursor: pointer; }
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: white;
+    border-radius: 16px;
+    max-width: 760px;
+    width: 100%;
+    margin: auto;
+    overflow: hidden;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
+  .modal-header {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-accent));
+    padding: 2rem 2rem 1.5rem;
+    position: relative;
+  }
+  .modal-module-num { font-family: 'Montserrat', sans-serif; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+  .modal-title { font-family: 'Montserrat', sans-serif; font-size: 1.6rem; font-weight: 800; color: white; }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: rgba(255,255,255,0.2); border: none; color: white;
+    width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.35); }
+  .modal-body { padding: 2rem; }
+  .modal-body h4 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1rem; color: var(--blue-dark); margin: 1.5rem 0 0.6rem; }
+  .modal-body h4:first-child { margin-top: 0; }
+  .modal-body p { font-size: 0.95rem; color: var(--gray-700); margin-bottom: 0.6rem; line-height: 1.7; }
+  .modal-body ul { padding-left: 1.2rem; margin-bottom: 0.6rem; }
+  .modal-body ul li { font-size: 0.93rem; color: var(--gray-700); margin-bottom: 0.3rem; }
+  .modal-code {
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    padding: 1.2rem 1.4rem;
+    border-radius: 10px;
+    margin: 0.8rem 0 1rem;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .modal-code .kw { color: #ff7b72; }
+  .modal-code .fn { color: #d2a8ff; }
+  .modal-code .st { color: #a5d6ff; }
+  .modal-code .cm { color: #8b949e; }
+  .modal-code .nb { color: #79c0ff; }
+  .modal-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1rem; }
+  .modal-tag {
+    background: var(--blue-light); color: var(--blue-dark);
+    font-family: 'Montserrat', sans-serif; font-size: 0.78rem; font-weight: 700;
+    padding: 4px 12px; border-radius: 12px;
+  }
+  .modal-footer {
+    border-top: 1px solid var(--gray-200);
+    padding: 1.2rem 2rem;
+    display: flex; gap: 1rem; align-items: center; justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .modal-nav-btns { display: flex; gap: 0.75rem; }
+  .btn-modal-sec {
+    background: var(--gray-100); color: var(--gray-700);
+    border: 1.5px solid var(--gray-200); padding: 9px 20px;
+    border-radius: 8px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.85rem;
+    cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block;
+  }
+  .btn-modal-sec:hover { background: var(--gray-200); }
+  /* MODULE MODAL */
+  .module-card { cursor: pointer; }
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: white;
+    border-radius: 16px;
+    max-width: 760px;
+    width: 100%;
+    margin: auto;
+    overflow: hidden;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
+  .modal-header {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-accent));
+    padding: 2rem 2rem 1.5rem;
+    position: relative;
+  }
+  .modal-module-num { font-family: 'Montserrat', sans-serif; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+  .modal-title { font-family: 'Montserrat', sans-serif; font-size: 1.6rem; font-weight: 800; color: white; }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: rgba(255,255,255,0.2); border: none; color: white;
+    width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.35); }
+  .modal-body { padding: 2rem; max-height: 60vh; overflow-y: auto; }
+  .modal-body h4 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1rem; color: var(--blue-dark); margin: 1.5rem 0 0.6rem; }
+  .modal-body h4:first-child { margin-top: 0; }
+  .modal-body p { font-size: 0.95rem; color: var(--gray-700); margin-bottom: 0.6rem; line-height: 1.7; }
+  .modal-body ul { padding-left: 1.4rem; margin-bottom: 0.8rem; }
+  .modal-body ul li { font-size: 0.93rem; color: var(--gray-700); margin-bottom: 0.3rem; line-height: 1.6; }
+  .modal-code {
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    padding: 1.2rem 1.4rem;
+    border-radius: 10px;
+    margin: 0.8rem 0 1rem;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .modal-footer {
+    border-top: 1px solid var(--gray-200);
+    padding: 1.2rem 2rem;
+    display: flex; gap: 1rem; align-items: center; justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .modal-nav-btns { display: flex; gap: 0.75rem; }
+  .btn-modal-sec {
+    background: var(--gray-100); color: var(--gray-700);
+    border: 1.5px solid var(--gray-200); padding: 9px 20px;
+    border-radius: 8px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.85rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-modal-sec:hover { background: var(--gray-200); }
+  .tip-box {
+    background: var(--blue-light); border-left: 3px solid var(--blue-accent);
+    border-radius: 0 8px 8px 0; padding: 0.8rem 1rem; margin: 0.8rem 0;
+    font-size: 0.9rem; color: var(--blue-dark);
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">🤖 <span>Python</span>Bot</div>
+  <ul class="nav-links">
+    <li><a href="#modules-section">Модули</a></li>
+    <li><a href="#code-section">Практика</a></li>
+    <li><a href="#quiz-section">Тест</a></li>
+    <li><a href="#video-section">Видеоуроки</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Python · 10–11 класс</div>
+  <h1>Создание <em>чат-ботов</em><br>с нуля на Python</h1>
+  <p>От основ программирования до умного бота с ИИ — пошагово, с практикой и живыми примерами кода</p>
+  <div class="hero-buttons">
+    <a href="#modules-section" class="btn-primary">Начать обучение</a>
+    <a href="#code-section" class="btn-secondary">Попробовать код</a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-num">5</div><div class="stat-label">модулей</div></div>
+  <div class="stat"><div class="stat-num">15+</div><div class="stat-label">практических задач</div></div>
+  <div class="stat"><div class="stat-num">8</div><div class="stat-label">видеоуроков</div></div>
+  <div class="stat"><div class="stat-num">0₽</div><div class="stat-label">полностью бесплатно</div></div>
+</div>
+
+<!-- MODULES -->
+<section id="modules-section">
+  <div class="section-header">
+    <div class="section-tag">Программа курса</div>
+    <h2>Что вы изучите</h2>
+    <p class="section-sub">Курс разделён на модули — начинайте с первого или выбирайте нужную тему</p>
+  </div>
+  <div class="modules-grid">
+    <div class="module-card" onclick="openModule(0)">
+      <div class="module-num">Модуль 01</div>
+      <div class="module-card-content">
+        <h3>Основы Python</h3>
+        <div class="module-topics">
+          <span class="topic-tag">print()</span>
+          <span class="topic-tag">if/else</span>
+          <span class="topic-tag">for/while</span>
+          <span class="topic-tag">def</span>
+        </div>
+      </div>
+      <span class="module-card-arrow">→</span>
+    </div>
+    <div class="module-card" onclick="openModule(1)">
+      <div class="module-num">Модуль 02</div>
+      <div class="module-card-content">
+        <h3>Ввод и вывод. Диалог</h3>
+        <div class="module-topics">
+          <span class="topic-tag">input()</span>
+          <span class="topic-tag">str</span>
+          <span class="topic-tag">split()</span>
+          <span class="topic-tag">format()</span>
+        </div>
+      </div>
+      <span class="module-card-arrow">→</span>
+    </div>
+    <div class="module-card" onclick="openModule(2)">
+      <div class="module-num">Модуль 03</div>
+      <div class="module-card-content">
+        <h3>Логика бота</h3>
+        <div class="module-topics">
+          <span class="topic-tag">dict</span>
+          <span class="topic-tag">in</span>
+          <span class="topic-tag">lower()</span>
+          <span class="topic-tag">match</span>
+        </div>
+      </div>
+      <span class="module-card-arrow">→</span>
+    </div>
+    <div class="module-card" onclick="openModule(3)">
+      <div class="module-num">Модуль 04</div>
+      <div class="module-card-content">
+        <h3>Telegram Bot API</h3>
+        <div class="module-topics">
+          <span class="topic-tag">python-telegram-bot</span>
+          <span class="topic-tag">handlers</span>
+          <span class="topic-tag">polling</span>
+        </div>
+      </div>
+      <span class="module-card-arrow">→</span>
+    </div>
+    <div class="module-card" onclick="openModule(4)">
+      <div class="module-num">Модуль 05</div>
+      <div class="module-card-content">
+        <h3>ИИ-интеграция</h3>
+        <div class="module-topics">
+          <span class="topic-tag">OpenAI API</span>
+          <span class="topic-tag">requests</span>
+          <span class="topic-tag">JSON</span>
+        </div>
+      </div>
+      <span class="module-card-arrow">→</span>
+    </div>
+    <div class="module-card" onclick="openModule(5)" style="background: var(--blue-light); border-color: var(--blue-mid);">
+      <div class="module-num" style="color: var(--blue-dark);">Проект</div>
+      <div class="module-card-content">
+        <h3 style="color: var(--blue-dark);">Ваш собственный бот</h3>
+        <div class="module-topics">
+          <span class="topic-tag">всё сразу</span>
+          <span class="topic-tag">деплой</span>
+          <span class="topic-tag">Railway</span>
+        </div>
+      </div>
+      <span class="module-card-arrow" style="color: var(--blue-dark);">→</span>
+    </div>
+  </div>
+</section>
+
+<!-- MODULE MODAL -->
+<div class="modal-overlay" id="module-modal" onclick="closeModalOutside(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-module-num" id="modal-num"></div>
+      <div class="modal-title" id="modal-title"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <div class="modal-nav-btns">
+        <button class="btn-modal-sec" id="btn-prev" onclick="prevModule()">← Назад</button>
+        <button class="btn-modal-sec" id="btn-next" onclick="nextModule()">Вперёд →</button>
+      </div>
+      <a href="#code-section" class="btn-primary" onclick="closeModal()" style="border:none; cursor:pointer; padding: 9px 20px; font-size: 0.85rem; display:inline-block;">Перейти к практике →</a>
+    </div>
+  </div>
+</div>
+
+<!-- CODE SECTION -->
+<div id="code-section">
+  <section style="padding-top: 0; padding-bottom: 0;">
+    <div class="section-header" style="padding-top: 4rem;">
+      <div class="section-tag">Интерактивная практика</div>
+      <h2>Запусти код прямо здесь</h2>
+      <p class="section-sub">Выбери задачу и нажми «Запустить» — увидишь результат мгновенно</p>
+    </div>
+    <div class="editor-container">
+      <div class="exercises-grid">
+        <div class="exercise-card" onclick="loadExercise(0)">
+          <span class="diff-badge diff-easy">Легко</span>
+          <h4>Первый бот</h4>
+          <p>Бот приветствует пользователя и спрашивает имя</p>
+        </div>
+        <div class="exercise-card" onclick="loadExercise(1)">
+          <span class="diff-badge diff-medium">Средне</span>
+          <h4>Бот-калькулятор</h4>
+          <p>Бот выполняет арифметические операции по команде</p>
+        </div>
+        <div class="exercise-card" onclick="loadExercise(2)">
+          <span class="diff-badge diff-hard">Сложно</span>
+          <h4>Бот-викторина</h4>
+          <p>Задаёт вопросы и подсчитывает правильные ответы</p>
+        </div>
+      </div>
+      <div style="margin-top: 2rem;">
+        <div class="editor-header">
+          <div class="editor-dots">
+            <div class="dot dot-r"></div>
+            <div class="dot dot-y"></div>
+            <div class="dot dot-g"></div>
+          </div>
+          <div class="editor-title">Python Simulator — попробуй и измени код</div>
+          <div></div>
+        </div>
+        <textarea id="code-editor" spellcheck="false"># Выбери задание выше или напиши свой код
+# Это симулятор: он показывает, что выведет print()
+
+name = input("Как тебя зовут? ")  # -> введём: Алиса
+print(f"Привет, {name}! Я твой первый бот 🤖")
+print("Я могу помочь с простыми задачами.")
+print("Напиши /help чтобы узнать больше.")</textarea>
+        <div class="editor-footer">
+          <div style="display:flex; gap:8px;">
+            <button class="btn-run" onclick="runCode()">▶ Запустить</button>
+            <button class="btn-reset" onclick="resetCode()">Сбросить</button>
+          </div>
+          <span style="color:rgba(255,255,255,0.3); font-size:0.8rem;">Python 3.11 (симулятор)</span>
+        </div>
+        <div id="code-output"></div>
+      </div>
+    </div>
+    <div style="padding-bottom: 4rem;"></div>
+  </section>
+</div>
+
+<!-- QUIZ -->
+<section id="quiz-section">
+  <div class="section-header">
+    <div class="section-tag">Проверь знания</div>
+    <h2>Интерактивный тест</h2>
+    <p class="section-sub">10 вопросов по материалу курса — ответь и узнай результат</p>
+  </div>
+  <div class="quiz-wrapper">
+    <div class="quiz-progress"><div class="quiz-bar" id="quiz-bar" style="width: 0%"></div></div>
+    <div id="quiz-container"></div>
+    <div class="quiz-result" id="quiz-result">
+      <div class="result-score" id="result-score"></div>
+      <div class="result-label" id="result-label"></div>
+      <br>
+      <button class="btn-primary" onclick="restartQuiz()" style="border: none; cursor: pointer; padding: 12px 32px;">Пройти снова</button>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO -->
+<div id="video-section">
+  <section style="padding-top: 0; padding-bottom: 0;">
+    <div style="padding-top: 4rem; text-align: center; margin-bottom: 3rem;">
+      <div class="section-tag">Видеоуроки</div>
+      <h2>Смотри и повторяй</h2>
+      <p class="section-sub" style="margin: 0 auto;">Видеоматериалы по каждой теме курса — включай и практикуй</p>
+    </div>
+    <div class="video-grid" style="max-width: 1000px; margin: 0 auto;">
+      <div class="video-card">
+        <div class="video-thumb" style="background: #1a365d;" onclick="openVideo('https://rutube.ru/video/dbe725fb7e9bd8491916980d4a539970/?r=wd')">
+          <div class="thumb-bg">🐍</div>
+          <div class="play-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1a6fa8"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="video-dur">4:26:52</div>
+        </div>
+        <div class="video-info">
+          <h4>Python с нуля — полный курс</h4>
+          <p>freeCodeCamp · Rutube</p>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb" style="background: #1a4a6d;" onclick="openVideo('https://rutube.ru/video/b9ba93873db1ec968832f04b50f0fa91/?r=wd')">
+          <div class="thumb-bg">🤖</div>
+          <div class="play-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1a6fa8"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="video-dur">1:12:00</div>
+        </div>
+        <div class="video-info">
+          <h4>Telegram-бот на Python</h4>
+          <p>Основы aiogram и bot API</p>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb" style="background: #0f2d4a;" onclick="openVideo('https://rutube.ru/video/1b88de143a6e4eaaafa0866752c929b5/?r=wd')">
+          <div class="thumb-bg">💬</div>
+          <div class="play-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1a6fa8"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="video-dur">45:00</div>
+        </div>
+        <div class="video-info">
+          <h4>Чат-бот с ИИ (OpenAI API)</h4>
+          <p>Интеграция GPT в своего бота</p>
+        </div>
+      </div>
+    </div>
+    <div style="padding-bottom: 4rem;"></div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>Курс создан для учеников <strong>10–11 классов</strong> · Практическая работа по HTML · 2026</p>
+</footer>
+
+<script>
+const exercises = [
+  {
+    title: "Первый бот",
+    code: `# Модуль 1: Первый бот
+# Имитируем input() — в реальности пользователь вводит текст
+
+def bot_greet(user_name):
+    print(f"Бот: Привет, {user_name}! 👋")
+    print("Бот: Я твой учебный ассистент по Python.")
+    print("Бот: Введи /help чтобы узнать, что я умею.")
+
+# Симулируем ввод пользователя
+user_input = "Алиса"
+print(f"Пользователь: {user_input}")
+bot_greet(user_input)`
+  },
+  {
+    title: "Бот-калькулятор",
+    code: `# Модуль 2: Бот-калькулятор
+def calculator_bot(expression):
+    print(f"Пользователь: {expression}")
+    parts = expression.split()
+    if len(parts) != 3:
+        print("Бот: ❌ Формат: число операция число (напр: 5 + 3)")
+        return
+    a, op, b = parts
+    try:
+        a, b = float(a), float(b)
+    except:
+        print("Бот: ❌ Введи числа!")
+        return
+    if op == '+': result = a + b
+    elif op == '-': result = a - b
+    elif op == '*': result = a * b
+    elif op == '/':
+        if b == 0:
+            print("Бот: ❌ На ноль делить нельзя!")
+            return
+        result = a / b
+    else:
+        print(f"Бот: ❌ Неизвестная операция '{op}'")
+        return
+    print(f"Бот: ✅ Результат: {a} {op} {b} = {result}")`
+
+    + "\n\n# Примеры:\ncalculator_bot('10 + 5')\ncalculator_bot('100 / 4')\ncalculator_bot('7 * 8')"
+  },
+  {
+    title: "Бот-викторина",
+    code: `# Модуль 3: Бот-викторина по Python
+questions = [
+    ("Какая функция выводит текст в Python?", "print"),
+    ("Как называется тип для целых чисел?", "int"),
+    ("Что означает 'def' в Python?", "def"),
+]
+
+score = 0
+print("Бот: 🧠 Начинаем викторину!")
+print("Бот: Я задам 3 вопроса, пиши ответы.")
+print()
+
+# Симулируем ответы пользователя
+user_answers = ["print", "str", "def"]
+
+for i, (q, correct) in enumerate(questions):
+    answer = user_answers[i]
+    print(f"Бот: Вопрос {i+1}: {q}")
+    print(f"Ты: {answer}")
+    if answer.strip().lower() == correct.lower():
+        print("Бот: ✅ Правильно!")
+        score += 1
+    else:
+        print(f"Бот: ❌ Неверно. Правильный ответ: {correct}")
+    print()
+
+print(f"Бот: 🏆 Итого: {score}/{len(questions)} правильных ответов!")`
+  }
+];
+
+function loadExercise(idx) {
+  document.getElementById('code-editor').value = exercises[idx].code;
+  document.getElementById('code-output').style.display = 'none';
+  document.getElementById('code-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function runCode() {
+  const code = document.getElementById('code-editor').value;
+  const output = document.getElementById('code-output');
+  output.style.display = 'block';
+
+  let result = [];
+  const lines = code.split('\n');
+  const variables = {};
+
+  // Simple Python simulator
+  try {
+    let i = 0;
+    const printLines = [];
+    // Extract print statements and basic assignments
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('#') || trimmed === '') continue;
+
+      // Handle print()
+      const printMatch = trimmed.match(/^print\((.+)\)$/);
+      if (printMatch) {
+        let expr = printMatch[1];
+        // f-string
+        expr = expr.replace(/f["'](.+?)["']/g, (_, content) => {
+          return content.replace(/\{(\w+)\}/g, (__, varname) => {
+            return variables[varname] !== undefined ? variables[varname] : varname;
+          });
+        });
+        // plain string
+        expr = expr.replace(/^["'](.*)["']$/, '$1');
+        // quoted with escape
+        if (expr.includes('"') || expr.includes("'")) {
+          expr = expr.replace(/^["']|["']$/g, '');
+        }
+        // variable
+        if (variables[expr] !== undefined) expr = variables[expr];
+        printLines.push(String(expr));
+        continue;
+      }
+
+      // Handle simple assignment: var = value
+      const assignMatch = trimmed.match(/^(\w+)\s*=\s*(.+)$/);
+      if (assignMatch && !assignMatch[1].startsWith('def')) {
+        let val = assignMatch[2].trim();
+        val = val.replace(/^["'](.*)["']$/, '$1');
+        variables[assignMatch[1]] = val;
+      }
+
+      // Handle function calls for our presets
+      const callMatch = trimmed.match(/^(\w+)\(["'](.+)["']\)$/);
+      if (callMatch) {
+        // simulate calculator_bot or bot_greet
+        if (callMatch[1] === 'calculator_bot') {
+          const parts = callMatch[2].split(' ');
+          if (parts.length === 3) {
+            const a = parseFloat(parts[0]), b = parseFloat(parts[2]), op = parts[1];
+            printLines.push(`Пользователь: ${callMatch[2]}`);
+            let r;
+            if (op==='+') r=a+b; else if(op==='-') r=a-b; else if(op==='*') r=a*b; else if(op==='/' && b!==0) r=a/b;
+            if (r !== undefined) printLines.push(`Бот: ✅ Результат: ${a} ${op} ${b} = ${r}`);
+          }
+        } else if (callMatch[1] === 'bot_greet') {
+          const n = callMatch[2];
+          printLines.push(`Бот: Привет, ${n}! 👋`);
+          printLines.push('Бот: Я твой учебный ассистент по Python.');
+          printLines.push('Бот: Введи /help чтобы узнать, что я умею.');
+        }
+      }
+    }
+
+    if (printLines.length === 0) {
+      output.textContent = '// Нет вывода. Убедитесь, что в коде есть print()';
+    } else {
+      output.textContent = printLines.join('\n');
+    }
+    output.style.color = '#3fb950';
+  } catch(e) {
+    output.textContent = `Ошибка: ${e.message}`;
+    output.style.color = '#ff7b72';
+  }
+}
+
+const defaultCode = document.getElementById('code-editor').value;
+function resetCode() {
+  document.getElementById('code-editor').value = defaultCode;
+  document.getElementById('code-output').style.display = 'none';
+}
+
+// QUIZ
+const quizData = [
+  { q: "Какая команда используется для вывода текста в Python?", opts: ["show()", "print()", "display()", "echo()"], ans: 1, explain: "print() — стандартная функция для вывода в Python." },
+  { q: "Что такое чат-бот?", opts: ["Программа-вирус", "Программа, имитирующая диалог с человеком", "База данных", "Веб-браузер"], ans: 1, explain: "Чат-бот — программа, которая ведёт диалог с пользователем автоматически." },
+  { q: "Какой тип данных хранит текст в Python?", opts: ["int", "float", "str", "bool"], ans: 2, explain: "str (string) — тип для хранения строк текста." },
+  { q: "Как получить ввод от пользователя в Python?", opts: ["get()", "read()", "input()", "scan()"], ans: 2, explain: "input() останавливает программу и ждёт ввода пользователя." },
+  { q: "Как объявить функцию в Python?", opts: ["function myFunc():", "def myFunc():", "func myFunc():", "define myFunc():"], ans: 1, explain: "Функции объявляются с помощью ключевого слова def." },
+  { q: "Что делает метод .lower() у строки?", opts: ["Удаляет пробелы", "Переводит в нижний регистр", "Разбивает строку", "Переводит в верхний регистр"], ans: 1, explain: ".lower() переводит все буквы строки в нижний регистр." },
+  { q: "Для чего нужен файл requirements.txt?", opts: ["Хранит исходный код бота", "Перечисляет зависимости проекта", "Содержит настройки Telegram", "Хранит токен API"], ans: 1, explain: "requirements.txt содержит список библиотек, необходимых для проекта." },
+  { q: "Что такое API в контексте чат-ботов?", opts: ["Язык программирования", "Интерфейс для взаимодействия программ", "Тип базы данных", "Редактор кода"], ans: 1, explain: "API (Application Programming Interface) позволяет программам общаться друг с другом — например, боту с Telegram." },
+  { q: "Какая библиотека чаще всего используется для Telegram-ботов?", opts: ["flask", "numpy", "python-telegram-bot", "pandas"], ans: 2, explain: "python-telegram-bot — популярная библиотека для работы с Telegram Bot API." },
+  { q: "Что хранится в словаре (dict) в Python?", opts: ["Только числа", "Только строки", "Пары 'ключ — значение'", "Список чисел"], ans: 2, explain: "Словарь (dict) хранит данные в формате {ключ: значение}, что удобно для логики бота." },
+];
+
+let currentQ = 0, score = 0, answered = false;
+
+function renderQuestion() {
+  if (currentQ >= quizData.length) {
+    showResult(); return;
+  }
+  const q = quizData[currentQ];
+  const pct = (currentQ / quizData.length) * 100;
+  document.getElementById('quiz-bar').style.width = pct + '%';
+  const letters = ['А', 'Б', 'В', 'Г'];
+  document.getElementById('quiz-container').innerHTML = `
+    <div class="quiz-question">
+      <div class="q-num">Вопрос ${currentQ + 1} из ${quizData.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">
+        ${q.opts.map((opt, i) => `
+          <button class="q-option" onclick="selectAnswer(${i})">
+            <span class="option-letter">${letters[i]}</span>
+            ${opt}
+          </button>
+        `).join('')}
+      </div>
+      <div class="q-feedback" id="q-feedback"></div>
+    </div>
+    <div style="display:flex; justify-content: flex-end; margin-top: 1rem;">
+      <button class="btn-primary" id="next-btn" style="display:none; border:none; cursor:pointer;" onclick="nextQuestion()">
+        ${currentQ + 1 === quizData.length ? 'Посмотреть результат' : 'Следующий вопрос →'}
+      </button>
+    </div>
+  `;
+  answered = false;
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = quizData[currentQ];
+  const opts = document.querySelectorAll('.q-option');
+  const fb = document.getElementById('q-feedback');
+  opts.forEach(o => o.classList.add('disabled'));
+  opts[idx].classList.add(idx === q.ans ? 'correct' : 'wrong');
+  if (idx !== q.ans) opts[q.ans].classList.add('correct');
+  if (idx === q.ans) {
+    score++;
+    fb.className = 'q-feedback show correct-fb';
+    fb.textContent = '✅ Правильно! ' + q.explain;
+  } else {
+    fb.className = 'q-feedback show wrong-fb';
+    fb.textContent = '❌ Неверно. ' + q.explain;
+  }
+  document.getElementById('next-btn').style.display = 'inline-block';
+}
+
+function nextQuestion() {
+  currentQ++;
+  renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('quiz-bar').style.width = '100%';
+  document.getElementById('quiz-container').style.display = 'none';
+  const res = document.getElementById('quiz-result');
+  res.classList.add('show');
+  document.getElementById('result-score').textContent = `${score}/${quizData.length}`;
+  const pct = (score / quizData.length) * 100;
+  const msgs = [
+    [0, 40, '😕 Повтори материал курса и попробуй снова!'],
+    [40, 70, '🙂 Неплохо! Ещё немного практики — и будет отлично.'],
+    [70, 90, '😊 Хороший результат! Ты хорошо усвоил материал.'],
+    [90, 101, '🏆 Отлично! Ты настоящий знаток Python-ботов!'],
+  ];
+  const [,, msg] = msgs.find(([lo, hi]) => pct >= lo && pct < hi);
+  document.getElementById('result-label').textContent = msg;
+}
+
+function restartQuiz() {
+  currentQ = 0; score = 0;
+  document.getElementById('quiz-container').style.display = 'block';
+  document.getElementById('quiz-result').classList.remove('show');
+  renderQuestion();
+}
+
+function openVideo(url) {
+  window.open(url, '_blank');
+}
+
+renderQuestion();
+
+// MODULE MODAL DATA
+const modules = [
+  {
+    num: 'Модуль 01',
+    title: 'Основы Python',
+    body: `
+      <h4>Что такое Python?</h4>
+      <p>Python — один из самых популярных языков программирования в мире. Он простой, читаемый и отлично подходит для написания чат-ботов, автоматизации и работы с ИИ.</p>
+      <div class="tip-box">💡 Python придумал Гвидо ван Россум в 1991 году. Сейчас его используют Google, Netflix, Instagram и большинство ИИ-компаний.</div>
+
+      <h4>Вывод текста — print()</h4>
+      <p>Самая первая команда — вывести что-то на экран. В чат-боте это будет ответ бота пользователю.</p>
+      <div class="modal-code"><span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">"Привет! Я чат-бот."</span>)
+<span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">"Чем могу помочь?"</span>)</div>
+
+      <h4>Переменные</h4>
+      <p>Переменная — это контейнер для хранения данных. Имя пользователя, его сообщение, счёт в викторине — всё это переменные.</p>
+      <div class="modal-code">name = <span style="color:#a5d6ff">"Алиса"</span>
+age = <span style="color:#79c0ff">16</span>
+<span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">f"Привет, {name}! Тебе {age} лет."</span>)</div>
+
+      <h4>Условия — if / else</h4>
+      <p>Условия позволяют боту принимать решения: если пользователь написал одно — ответить так, иначе — иначе.</p>
+      <div class="modal-code">message = <span style="color:#a5d6ff">"привет"</span>
+
+<span style="color:#ff7b72">if</span> message == <span style="color:#a5d6ff">"привет"</span>:
+    <span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">"Бот: Здравствуй! 👋"</span>)
+<span style="color:#ff7b72">else</span>:
+    <span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">"Бот: Я тебя не понял."</span>)</div>
+
+      <h4>Циклы — for и while</h4>
+      <p>Цикл <code>while True</code> — основа любого бота: он будет бесконечно слушать сообщения пользователя и отвечать.</p>
+      <div class="modal-code"><span style="color:#8b949e"># Простейший цикл бота (в консоли)</span>
+<span style="color:#ff7b72">while</span> <span style="color:#79c0ff">True</span>:
+    msg = <span style="color:#d2a8ff">input</span>(<span style="color:#a5d6ff">"Ты: "</span>)
+    <span style="color:#ff7b72">if</span> msg == <span style="color:#a5d6ff">"пока"</span>:
+        <span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">"Бот: До свидания!"</span>)
+        <span style="color:#ff7b72">break</span>
+    <span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">f"Бот: Ты написал — {msg}"</span>)</div>
+
+      <h4>Функции — def</h4>
+      <p>Функция — это блок кода с именем. Вместо того чтобы писать одно и то же несколько раз, мы упаковываем его в функцию.</p>
+      <div class="modal-code"><span style="color:#ff7b72">def</span> <span style="color:#d2a8ff">greet</span>(name):
+    <span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">f"Привет, {name}! Добро пожаловать."</span>)
+
+greet(<span style="color:#a5d6ff">"Алиса"</span>)
+greet(<span style="color:#a5d6ff">"Максим"</span>)</div>
+
+      <h4>✅ Итог модуля</h4>
+      <ul>
+        <li>print() выводит текст</li>
+        <li>Переменные хранят данные</li>
+        <li>if/else — выбор между вариантами</li>
+        <li>while True — бесконечный цикл бота</li>
+        <li>def — объявление функции</li>
+      </ul>`
+  },
+  {
+    num: 'Модуль 02',
+    title: 'Ввод и вывод. Диалог',
+    body: `
+      <h4>Получаем сообщение — input()</h4>
+      <p>Функция <code>input()</code> останавливает программу и ждёт, пока пользователь что-то введёт. В реальном боте роль input() играет получение сообщения из Telegram или другого мессенджера.</p>
+      <div class="modal-code">name = <span style="color:#d2a8ff">input</span>(<span style="color:#a5d6ff">"Как тебя зовут? "</span>)
+<span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">f"Приятно познакомиться, {name}!"</span>)</div>
+
+      <h4>Работа со строками</h4>
+      <p>Строки — основной тип данных в боте. Вот самые нужные операции:</p>
+      <div class="modal-code">text = <span style="color:#a5d6ff">"  Привет, Мир!  "</span>
+
+<span style="color:#d2a8ff">print</span>(text.<span style="color:#d2a8ff">lower</span>())    <span style="color:#8b949e"># "  привет, мир!  "</span>
+<span style="color:#d2a8ff">print</span>(text.<span style="color:#d2a8ff">upper</span>())    <span style="color:#8b949e"># "  ПРИВЕТ, МИР!  "</span>
+<span style="color:#d2a8ff">print</span>(text.<span style="color:#d2a8ff">strip</span>())    <span style="color:#8b949e"># "Привет, Мир!" (без пробелов)</span>
+<span style="color:#d2a8ff">print</span>(<span style="color:#d2a8ff">len</span>(text))       <span style="color:#8b949e"># 18 (длина строки)</span></div>
+
+      <h4>Разбиваем сообщение — split()</h4>
+      <p>split() разбивает строку на список слов. Пригодится для разбора команд бота типа «/старт игра 5».</p>
+      <div class="modal-code">command = <span style="color:#a5d6ff">"/play quiz 10"</span>
+parts = command.<span style="color:#d2a8ff">split</span>()
+<span style="color:#d2a8ff">print</span>(parts)  <span style="color:#8b949e"># ['/play', 'quiz', '10']</span>
+<span style="color:#d2a8ff">print</span>(parts[<span style="color:#79c0ff">0</span>])  <span style="color:#8b949e"># '/play'</span>
+<span style="color:#d2a8ff">print</span>(parts[<span style="color:#79c0ff">2</span>])  <span style="color:#8b949e"># '10'</span></div>
+
+      <h4>Форматирование ответов — f-строки</h4>
+      <p>F-строки позволяют вставлять переменные прямо в текст — это самый удобный способ формировать ответы бота.</p>
+      <div class="modal-code">user = <span style="color:#a5d6ff">"Максим"</span>
+score = <span style="color:#79c0ff">42</span>
+<span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">f"Игрок {user} набрал {score} очков!"</span>)
+<span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">f"Это {'отлично' if score > 30 else 'неплохо'}!"</span>)</div>
+
+      <h4>Проверка содержимого — in</h4>
+      <p>Оператор <code>in</code> проверяет, есть ли слово или символ в строке. Отлично подходит для реакции бота на ключевые слова.</p>
+      <div class="modal-code">message = <span style="color:#a5d6ff">"помогите мне с домашним заданием"</span>
+
+<span style="color:#ff7b72">if</span> <span style="color:#a5d6ff">"помог"</span> <span style="color:#ff7b72">in</span> message:
+    <span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">"Бот: Конечно, чем помочь? 😊"</span>)</div>
+
+      <h4>✅ Итог модуля</h4>
+      <ul>
+        <li>input() — получаем текст от пользователя</li>
+        <li>.lower(), .strip() — нормализуем ввод</li>
+        <li>.split() — разбираем команды на части</li>
+        <li>f"..." — формируем ответы бота</li>
+        <li>in — ищем ключевые слова в сообщении</li>
+      </ul>`
+  },
+  {
+    num: 'Модуль 03',
+    title: 'Логика бота',
+    body: `
+      <h4>Словарь команд — dict</h4>
+      <p>Словарь — идеальная структура для хранения ответов бота. Ключ — команда пользователя, значение — ответ бота.</p>
+      <div class="modal-code">responses = {
+    <span style="color:#a5d6ff">"привет"</span>: <span style="color:#a5d6ff">"Здравствуй! 👋"</span>,
+    <span style="color:#a5d6ff">"пока"</span>: <span style="color:#a5d6ff">"До свидания! 👋"</span>,
+    <span style="color:#a5d6ff">"помощь"</span>: <span style="color:#a5d6ff">"Я могу: /quiz, /joke, /weather"</span>,
+    <span style="color:#a5d6ff">"как дела"</span>: <span style="color:#a5d6ff">"Отлично, спасибо! А у тебя?"</span>,
+}
+
+msg = <span style="color:#d2a8ff">input</span>(<span style="color:#a5d6ff">"Ты: "</span>).<span style="color:#d2a8ff">lower</span>().<span style="color:#d2a8ff">strip</span>()
+answer = responses.<span style="color:#d2a8ff">get</span>(msg, <span style="color:#a5d6ff">"Не понял, попробуй /помощь"</span>)
+<span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">f"Бот: {answer}"</span>)</div>
+
+      <h4>Поиск по ключевым словам</h4>
+      <p>Реальные сообщения не всегда точно совпадают с командами. Ищем ключевые слова в тексте:</p>
+      <div class="modal-code">keywords = {
+    <span style="color:#a5d6ff">"погод"</span>: <span style="color:#a5d6ff">"Сегодня +20°C, солнечно ☀️"</span>,
+    <span style="color:#a5d6ff">"шутк"</span>: <span style="color:#a5d6ff">"Почему программисты путают Хэллоуин и Рождество? Потому что Oct 31 = Dec 25! 🎃"</span>,
+    <span style="color:#a5d6ff">"помог"</span>: <span style="color:#a5d6ff">"Чем именно помочь?"</span>,
+}
+
+msg = <span style="color:#a5d6ff">"расскажи шутку"</span>.<span style="color:#d2a8ff">lower</span>()
+reply = <span style="color:#a5d6ff">"Не понял 🤔"</span>
+<span style="color:#ff7b72">for</span> key, answer <span style="color:#ff7b72">in</span> keywords.<span style="color:#d2a8ff">items</span>():
+    <span style="color:#ff7b72">if</span> key <span style="color:#ff7b72">in</span> msg:
+        reply = answer
+        <span style="color:#ff7b72">break</span>
+<span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">f"Бот: {reply}"</span>)</div>
+
+      <h4>Состояния бота</h4>
+      <p>Более сложный бот «помнит» контекст разговора с помощью переменной состояния:</p>
+      <div class="modal-code">state = <span style="color:#a5d6ff">"start"</span>  <span style="color:#8b949e"># текущее состояние</span>
+name = <span style="color:#a5d6ff">""</span>
+
+<span style="color:#ff7b72">if</span> state == <span style="color:#a5d6ff">"start"</span>:
+    <span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">"Бот: Привет! Как тебя зовут?"</span>)
+    state = <span style="color:#a5d6ff">"waiting_name"</span>
+
+<span style="color:#ff7b72">elif</span> state == <span style="color:#a5d6ff">"waiting_name"</span>:
+    name = <span style="color:#d2a8ff">input</span>(<span style="color:#a5d6ff">"Ты: "</span>)
+    <span style="color:#d2a8ff">print</span>(<span style="color:#a5d6ff">f"Бот: Отлично, {name}! Что хочешь узнать?"</span>)
+    state = <span style="color:#a5d6ff">"main"</span></div>
+
+      <h4>✅ Итог модуля</h4>
+      <ul>
+        <li>dict — хранилище ответов бота</li>
+        <li>.get(key, default) — безопасное получение ответа</li>
+        <li>Поиск по ключевым словам через in</li>
+        <li>Переменная state — память о контексте разговора</li>
+      </ul>`
+  },
+  {
+    num: 'Модуль 04',
+    title: 'Telegram Bot API',
+    body: `
+      <h4>Что такое Telegram Bot API?</h4>
+      <p>Telegram предоставляет бесплатный API, через который любой может создать бота. Для этого нужно получить токен у специального бота — @BotFather.</p>
+      <div class="tip-box">📱 Найди в Telegram бота <strong>@BotFather</strong>, напиши /newbot, придумай имя — и получишь токен вида: <code>123456789:AAFabc...</code></div>
+
+      <h4>Установка библиотеки</h4>
+      <p>Для работы с Telegram из Python используем библиотеку python-telegram-bot. Устанавливается одной командой:</p>
+      <div class="modal-code">pip install python-telegram-bot</div>
+
+      <h4>Первый бот на Telegram</h4>
+      <p>Минимальный рабочий бот — обработчик команды /start и обычных сообщений:</p>
+      <div class="modal-code"><span style="color:#ff7b72">from</span> telegram <span style="color:#ff7b72">import</span> Update
+<span style="color:#ff7b72">from</span> telegram.ext <span style="color:#ff7b72">import</span> ApplicationBuilder, CommandHandler, MessageHandler, filters
+
+TOKEN = <span style="color:#a5d6ff">"ВАШ_ТОКЕН_ЗДЕСЬ"</span>
+
+<span style="color:#ff7b72">async def</span> <span style="color:#d2a8ff">start</span>(update, context):
+    <span style="color:#ff7b72">await</span> update.message.<span style="color:#d2a8ff">reply_text</span>(<span style="color:#a5d6ff">"Привет! Я бот 🤖"</span>)
+
+<span style="color:#ff7b72">async def</span> <span style="color:#d2a8ff">echo</span>(update, context):
+    text = update.message.text
+    <span style="color:#ff7b72">await</span> update.message.<span style="color:#d2a8ff">reply_text</span>(<span style="color:#a5d6ff">f"Ты написал: {text}"</span>)
+
+app = ApplicationBuilder().<span style="color:#d2a8ff">token</span>(TOKEN).<span style="color:#d2a8ff">build</span>()
+app.<span style="color:#d2a8ff">add_handler</span>(CommandHandler(<span style="color:#a5d6ff">"start"</span>, start))
+app.<span style="color:#d2a8ff">add_handler</span>(MessageHandler(filters.TEXT, echo))
+app.<span style="color:#d2a8ff">run_polling</span>()</div>
+
+      <h4>Добавляем кнопки</h4>
+      <p>Telegram позволяет добавлять кнопки прямо в сообщение — это делает бота намного удобнее:</p>
+      <div class="modal-code"><span style="color:#ff7b72">from</span> telegram <span style="color:#ff7b72">import</span> ReplyKeyboardMarkup
+
+keyboard = [[<span style="color:#a5d6ff">"📰 Новости"</span>, <span style="color:#a5d6ff">"🎮 Игра"</span>], [<span style="color:#a5d6ff">"❓ Помощь"</span>]]
+markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=<span style="color:#79c0ff">True</span>)
+
+<span style="color:#ff7b72">await</span> update.message.<span style="color:#d2a8ff">reply_text</span>(
+    <span style="color:#a5d6ff">"Выбери раздел:"</span>,
+    reply_markup=markup
+)</div>
+
+      <h4>✅ Итог модуля</h4>
+      <ul>
+        <li>Токен получаем у @BotFather</li>
+        <li>CommandHandler — обрабатывает команды (/start, /help)</li>
+        <li>MessageHandler — обрабатывает обычные сообщения</li>
+        <li>run_polling() — запускает бота</li>
+        <li>ReplyKeyboardMarkup — добавляет кнопки</li>
+      </ul>`
+  },
+  {
+    num: 'Модуль 05',
+    title: 'ИИ-интеграция',
+    body: `
+      <h4>Что такое ИИ-интеграция?</h4>
+      <p>Вместо жёстко прописанных ответов можно подключить нейросеть — тогда бот сможет отвечать на любые вопросы, объяснять темы, писать код и многое другое.</p>
+      <div class="tip-box">🤖 Мы будем использовать API OpenAI (ChatGPT). Для работы нужен API-ключ с сайта platform.openai.com</div>
+
+      <h4>Установка библиотеки</h4>
+      <div class="modal-code">pip install openai</div>
+
+      <h4>Первый запрос к GPT</h4>
+      <p>Отправляем сообщение нейросети и получаем ответ:</p>
+      <div class="modal-code"><span style="color:#ff7b72">from</span> openai <span style="color:#ff7b72">import</span> OpenAI
+
+client = OpenAI(api_key=<span style="color:#a5d6ff">"ВАШ_КЛЮЧ"</span>)
+
+response = client.chat.completions.<span style="color:#d2a8ff">create</span>(
+    model=<span style="color:#a5d6ff">"gpt-4o-mini"</span>,
+    messages=[
+        {<span style="color:#a5d6ff">"role"</span>: <span style="color:#a5d6ff">"system"</span>, <span style="color:#a5d6ff">"content"</span>: <span style="color:#a5d6ff">"Ты дружелюбный помощник."</span>},
+        {<span style="color:#a5d6ff">"role"</span>: <span style="color:#a5d6ff">"user"</span>, <span style="color:#a5d6ff">"content"</span>: <span style="color:#a5d6ff">"Что такое Python?"</span>}
+    ]
+)
+
+answer = response.choices[<span style="color:#79c0ff">0</span>].message.content
+<span style="color:#d2a8ff">print</span>(answer)</div>
+
+      <h4>ИИ-бот в Telegram</h4>
+      <p>Объединяем модуль 4 и модуль 5 — Telegram-бот, который отвечает через ChatGPT:</p>
+      <div class="modal-code"><span style="color:#ff7b72">from</span> openai <span style="color:#ff7b72">import</span> OpenAI
+<span style="color:#ff7b72">from</span> telegram.ext <span style="color:#ff7b72">import</span> ApplicationBuilder, MessageHandler, filters
+
+openai_client = OpenAI(api_key=<span style="color:#a5d6ff">"ВАШ_КЛЮЧ"</span>)
+
+<span style="color:#ff7b72">async def</span> <span style="color:#d2a8ff">ai_reply</span>(update, context):
+    user_msg = update.message.text
+    resp = openai_client.chat.completions.<span style="color:#d2a8ff">create</span>(
+        model=<span style="color:#a5d6ff">"gpt-4o-mini"</span>,
+        messages=[{<span style="color:#a5d6ff">"role"</span>: <span style="color:#a5d6ff">"user"</span>, <span style="color:#a5d6ff">"content"</span>: user_msg}]
+    )
+    answer = resp.choices[<span style="color:#79c0ff">0</span>].message.content
+    <span style="color:#ff7b72">await</span> update.message.<span style="color:#d2a8ff">reply_text</span>(answer)</div>
+
+      <h4>✅ Итог модуля</h4>
+      <ul>
+        <li>API-ключ OpenAI — получаем на platform.openai.com</li>
+        <li>chat.completions.create() — отправляем запрос к GPT</li>
+        <li>role: "system" — задаём роль/характер бота</li>
+        <li>role: "user" — сообщение пользователя</li>
+        <li>Объединяем с Telegram — получаем умного бота!</li>
+      </ul>`
+  },
+  {
+    num: 'Финальный проект',
+    title: 'Ваш собственный бот',
+    body: `
+      <h4>Задание финального проекта</h4>
+      <p>Создайте полноценного Telegram-бота на выбранную тему. Бот должен использовать знания из всех предыдущих модулей.</p>
+
+      <h4>Варианты тем</h4>
+      <ul>
+        <li>🌤️ <strong>Бот-погода</strong> — принимает город, возвращает прогноз (API OpenWeatherMap)</li>
+        <li>📚 <strong>Бот-расписание</strong> — хранит расписание уроков, отвечает на «что сегодня?»</li>
+        <li>🧠 <strong>Бот-викторина</strong> — задаёт вопросы, считает баллы, показывает рейтинг</li>
+        <li>🤖 <strong>ИИ-помощник</strong> — чат с GPT на выбранную тему (учёба, хобби, игры)</li>
+        <li>📝 <strong>Заметки-бот</strong> — сохраняет и выдаёт заметки пользователя</li>
+      </ul>
+
+      <h4>Структура проекта</h4>
+      <div class="modal-code">my_bot/
+├── bot.py          <span style="color:#8b949e"># основной файл</span>
+├── handlers.py     <span style="color:#8b949e"># обработчики сообщений</span>
+├── config.py       <span style="color:#8b949e"># токен и настройки</span>
+└── requirements.txt <span style="color:#8b949e"># зависимости</span></div>
+
+      <h4>Публикация на Railway (бесплатно)</h4>
+      <ul>
+        <li>Зарегистрируйся на railway.app</li>
+        <li>Создай новый проект → Deploy from GitHub</li>
+        <li>Загрузи код через GitHub</li>
+        <li>Добавь переменную BOT_TOKEN в настройках</li>
+        <li>Бот будет работать 24/7 ✅</li>
+      </ul>
+
+      <div class="tip-box">🏆 Готовый проект: разместите бота на Railway и поделитесь ссылкой с классом. Лучший бот получает 5!</div>
+
+      <h4>Чек-лист сдачи проекта</h4>
+      <ul>
+        <li>✅ Бот отвечает на /start и /help</li>
+        <li>✅ Есть минимум 3 функции/команды</li>
+        <li>✅ Обработка непонятных сообщений</li>
+        <li>✅ Бот запущен и работает 24/7</li>
+        <li>✅ Код загружен на GitHub</li>
+      </ul>`
+  }
+];
+
+let currentModule = 0;
+
+function openModule(idx) {
+  currentModule = idx;
+  renderModal();
+  document.getElementById('module-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function renderModal() {
+  const m = modules[currentModule];
+  document.getElementById('modal-num').textContent = m.num;
+  document.getElementById('modal-title').textContent = m.title;
+  document.getElementById('modal-body').innerHTML = m.body;
+  document.getElementById('btn-prev').disabled = currentModule === 0;
+  document.getElementById('btn-prev').style.opacity = currentModule === 0 ? '0.4' : '1';
+  document.getElementById('btn-next').disabled = currentModule === modules.length - 1;
+  document.getElementById('btn-next').style.opacity = currentModule === modules.length - 1 ? '0.4' : '1';
+  document.getElementById('modal-body').scrollTop = 0;
+}
+
+function closeModal() {
+  document.getElementById('module-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('module-modal')) closeModal();
+}
+
+function prevModule() {
+  if (currentModule > 0) { currentModule--; renderModal(); }
+}
+
+function nextModule() {
+  if (currentModule < modules.length - 1) { currentModule++; renderModal(); }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
