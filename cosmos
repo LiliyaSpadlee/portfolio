@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cosmos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:      #0a0a14;
+      --card:    #13132a;
+      --border:  #252545;
+      --text:    #d8dcf0;
+      --muted:   #7a80a8;
+      --purple:  #8b78f6;
+      --blue:    #38bdf8;
+      --gold:    #f6c06c;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Raleway', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* =============================================
+       ЭЛЕМЕНТ 10 — АНИМИРОВАННЫЙ ГРАДИЕНТНЫЙ ФОН
+       ============================================= */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background: linear-gradient(135deg, #0a0a14 0%, #1a0a35 30%, #0a1a30 60%, #0d0a18 100%);
+      background-size: 400% 400%;
+      animation: bgMove 8s ease infinite;
+    }
+    @keyframes bgMove {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ЭЛЕМЕНТ 1 — ПАДАЮЩИЕ ЗВЁЗДЫ */
+    #starCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,20,0.88);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+    }
+    .hdr {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-weight: 700; font-size: 1.1rem; color: var(--purple); letter-spacing: .05em; }
+    nav { display: flex; gap: 4px; }
+    nav a {
+      color: var(--muted);
+      padding: 6px 13px;
+      border-radius: 5px;
+      font-size: .86rem;
+      text-decoration: none;
+      transition: color .2s, background .2s;
+    }
+    nav a:hover { color: var(--text); background: rgba(139,120,246,.15); }
+    nav a.active { color: #fff; background: var(--purple); }
+
+    /* PAGES */
+    .page { display: none; animation: pgIn .3s ease; }
+    .page.active { display: block; }
+    @keyframes pgIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    main { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
+    h2 { font-size: 1.2rem; font-weight: 700; margin: 32px 0 14px; color: var(--text); }
+    p  { color: var(--muted); margin-bottom: 12px; font-size: .92rem; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 30px 0; }
+
+    /* CARDS */
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 16px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(139,120,246,.15); }
+    .card p { font-size: .85rem; margin-top: 6px; }
+    .tag {
+      display: inline-block;
+      font-size: .72rem;
+      background: rgba(139,120,246,.18);
+      color: var(--purple);
+      border-radius: 4px;
+      padding: 2px 8px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    /* ==============================================
+       ЭЛЕМЕНТ 6 — ГРАДИЕНТНЫЙ ТЕКСТ ПРИ НАВЕДЕНИИ
+       ============================================== */
+    .grad-title {
+      display: inline-block;
+      font-size: 1rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--purple), var(--blue), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200%;
+      background-position: 100%;
+      transition: background-position .5s;
+    }
+    .card:hover .grad-title { background-position: 0%; }
+
+    /* ==============================================
+       ЭЛЕМЕНТ 7 — ГРАВИРОВАННЫЙ ТЕКСТ
+       ============================================== */
+    .engraved {
+      display: inline-block;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1a1a30;
+      background: #1a1a30;
+      text-shadow:
+        1px 1px 1px rgba(255,255,255,.13),
+        -1px -1px 2px rgba(0,0,0,.8);
+      padding: 6px 20px;
+      border-radius: 6px;
+      margin-bottom: 22px;
+    }
+
+    /* ==============================================
+       ЭЛЕМЕНТ 8 — ПИШУЩАЯ МАШИНКА
+       ============================================== */
+    .typewriter {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #fff;
+      border-right: 3px solid var(--purple);
+      white-space: nowrap;
+      overflow: hidden;
+      display: inline-block;
+      animation: blink .75s step-end infinite;
+    }
+    @keyframes blink {
+      0%,100% { border-color: var(--purple); }
+      50%      { border-color: transparent; }
+    }
+
+    /* ==============================================
+       ЭЛЕМЕНТ 9 — СКОЛЬЗЯЩЕЕ ПОЯВЛЕНИЕ
+       ============================================== */
+    .slide-in {
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .slide-in.on { opacity: 1; transform: translateX(0); }
+
+    /* ==============================================
+       ЭЛЕМЕНТ 4 — БЛЕСТЯЩАЯ КНОПКА
+       ============================================== */
+    .btn-shiny {
+      position: relative;
+      overflow: hidden;
+      padding: 10px 24px;
+      border-radius: 6px;
+      border: none;
+      background: var(--purple);
+      color: #fff;
+      font-family: 'Raleway', sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .25s;
+    }
+    .btn-shiny::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 55%; height: 100%;
+      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.45) 50%, transparent 80%);
+      transition: left .5s ease;
+    }
+    .btn-shiny:hover { background: #a190f8; }
+    .btn-shiny:hover::before { left: 150%; }
+
+    /* ==============================================
+       ЭЛЕМЕНТ 3 — ДРОЖАЩАЯ КНОПКА
+       ============================================== */
+    .btn-shaky {
+      padding: 10px 24px;
+      border-radius: 6px;
+      border: 1px solid var(--blue);
+      background: transparent;
+      color: var(--blue);
+      font-family: 'Raleway', sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-shaky:hover { animation: shake .4s ease; background: rgba(56,189,248,.08); }
+    @keyframes shake {
+      0%,100% { transform: rotate(0); }
+      20%     { transform: rotate(-6deg); }
+      40%     { transform: rotate(6deg); }
+      60%     { transform: rotate(-4deg); }
+      80%     { transform: rotate(4deg); }
+    }
+
+    /* КНОПКИ РЯДОМ */
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+
+    /* ==============================================
+       ЭЛЕМЕНТ 2 — АНИМИРОВАННОЕ ПОЛЕ ПОИСКА
+       ============================================== */
+    .search-box {
+      width: 190px;
+      padding: 9px 14px;
+      border: 2px solid var(--purple);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      font-family: 'Raleway', sans-serif;
+      font-size: .88rem;
+      outline: none;
+      transition: width .4s ease, box-shadow .3s;
+    }
+    .search-box:focus { width: 320px; box-shadow: 0 0 0 3px rgba(139,120,246,.25); }
+    .search-box::placeholder { color: var(--muted); }
+
+    /* ==============================================
+       ЭЛЕМЕНТ 5 — ТУМБЛЕР
+       ============================================== */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .85rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .switch { position: relative; display: inline-block; width: 42px; height: 23px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .knob {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 23px;
+      cursor: pointer;
+      transition: background .3s;
+    }
+    .knob::before {
+      content: '';
+      position: absolute;
+      width: 17px; height: 17px;
+      border-radius: 50%;
+      background: #fff;
+      left: 3px; top: 3px;
+      transition: transform .3s;
+    }
+    .switch input:checked + .knob { background: var(--purple); }
+    .switch input:checked + .knob::before { transform: translateX(19px); }
+    #planetsGrid.list-mode { grid-template-columns: 1fr; }
+
+    /* АККОРДЕОН */
+    .acc { margin-top: 8px; }
+    .acc-item { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; overflow: hidden; }
+    .acc-h {
+      width: 100%;
+      background: var(--card);
+      border: none;
+      text-align: left;
+      padding: 13px 16px;
+      font-family: 'Raleway', sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      transition: background .2s;
+    }
+    .acc-h:hover { background: rgba(255,255,255,.03); }
+    .acc-arrow { transition: transform .3s; }
+    .acc-item.open .acc-arrow { transform: rotate(180deg); }
+    .acc-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+    .acc-inner { padding: 0 16px 14px; color: var(--muted); font-size: .88rem; }
+
+    /* ФОРМА */
+    .form { max-width: 460px; }
+    .fg { margin-bottom: 16px; }
+    .fg label { display: block; font-size: .83rem; color: var(--muted); margin-bottom: 5px; }
+    .fg input, .fg textarea {
+      width: 100%;
+      padding: 9px 13px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      font-family: 'Raleway', sans-serif;
+      font-size: .88rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .fg input:focus, .fg textarea:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(139,120,246,.2);
+    }
+    .fg textarea { resize: vertical; min-height: 90px; }
+    .ok-msg {
+      display: none;
+      margin-top: 12px;
+      padding: 11px 15px;
+      border-radius: 6px;
+      background: rgba(139,120,246,.15);
+      border: 1px solid var(--purple);
+      color: var(--purple);
+      font-size: .87rem;
+    }
+
+    /* НАВЕРХ */
+    #topBtn {
+      position: fixed;
+      bottom: 26px; right: 26px;
+      width: 38px; height: 38px;
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 1rem;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .3s, transform .3s;
+      z-index: 200;
+    }
+    #topBtn.show { opacity: 1; transform: translateY(0); }
+    #topBtn:hover { background: #a190f8; }
+
+    footer {
+      background: rgba(10,10,20,.9);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 20px;
+      font-size: .78rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="starCanvas"></canvas>
+
+<header>
+  <div class="hdr">
+    <span class="logo">COSMOS</span>
+    <nav>
+      <a href="#" class="nl active" data-p="home">Главная</a>
+      <a href="#" class="nl" data-p="planets">Планеты</a>
+      <a href="#" class="nl" data-p="faq">FAQ</a>
+      <a href="#" class="nl" data-p="contact">Контакты</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ====== ГЛАВНАЯ ====== -->
+  <div class="page active" id="page-home">
+
+    <!-- ЭЛЕМЕНТ 8: пишущая машинка -->
+    <div style="margin-bottom:10px;">
+      <span class="typewriter" id="tw"></span>
+    </div>
+    <p>Сайт о звёздах, планетах и тайнах вселенной.</p>
+
+    <!-- ЭЛЕМЕНТЫ 4 и 3: блестящая и дрожащая кнопки -->
+    <div class="btn-row">
+      <button class="btn-shiny" onclick="navigate('planets')">Смотреть планеты</button>
+      <button class="btn-shaky" onclick="navigate('faq')">Вопросы и ответы</button>
+    </div>
+
+    <hr/>
+
+    <!-- ЭЛЕМЕНТ 7: гравированный текст -->
+    <div><span class="engraved">О вселенной</span></div>
+
+    <!-- ЭЛЕМЕНТ 9: скользящее появление карточек -->
+    <div class="cards">
+      <div class="card slide-in">
+        <span class="tag">Звёзды</span>
+        <div class="grad-title">Жизненный цикл звезды</div>
+        <p>От туманности — до белого карлика. Миллиарды лет эволюции.</p>
+      </div>
+      <div class="card slide-in" style="transition-delay:.1s">
+        <span class="tag">Чёрные дыры</span>
+        <div class="grad-title">За горизонтом событий</div>
+        <p>Объекты, откуда не возвращается даже свет.</p>
+      </div>
+      <div class="card slide-in" style="transition-delay:.2s">
+        <span class="tag">Экзопланеты</span>
+        <div class="grad-title">Миры у других звёзд</div>
+        <p>Тысячи планет за пределами Солнечной системы.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== ПЛАНЕТЫ ====== -->
+  <div class="page" id="page-planets">
+    <h1>Планеты Солнечной системы</h1>
+
+    <!-- ЭЛЕМЕНТ 5: тумблер сетка/список -->
+    <div class="toggle-row">
+      <span>Сетка</span>
+      <label class="switch">
+        <input type="checkbox" id="tog"/>
+        <span class="knob"></span>
+      </label>
+      <span>Список</span>
+    </div>
+
+    <!-- ЭЛЕМЕНТ 2: поле поиска -->
+    <div style="margin-bottom:20px;">
+      <input class="search-box" type="text" placeholder="Найти планету..." id="srch"/>
+    </div>
+
+    <div class="cards" id="planetsGrid">
+      <div class="card" data-name="меркурий"><span class="tag">Твёрдая</span><div class="grad-title">Меркурий</div><p>Ближайшая к Солнцу. Перепад температур: −180 / +430 °C.</p></div>
+      <div class="card" data-name="венера"><span class="tag">Твёрдая</span><div class="grad-title">Венера</div><p>Самая горячая планета. Плотная атмосфера из CO₂.</p></div>
+      <div class="card" data-name="земля"><span class="tag">Твёрдая</span><div class="grad-title">Земля</div><p>Единственная известная планета с жизнью.</p></div>
+      <div class="card" data-name="марс"><span class="tag">Твёрдая</span><div class="grad-title">Марс</div><p>Красная планета. Главный кандидат на колонизацию.</p></div>
+      <div class="card" data-name="юпитер"><span class="tag">Газовый гигант</span><div class="grad-title">Юпитер</div><p>Крупнейшая планета. Большое Красное Пятно — шторм 350+ лет.</p></div>
+      <div class="card" data-name="сатурн"><span class="tag">Газовый гигант</span><div class="grad-title">Сатурн</div><p>Знаменит кольцами из льда и пыли.</p></div>
+      <div class="card" data-name="уран"><span class="tag">Ледяной гигант</span><div class="grad-title">Уран</div><p>Вращается «лёжа на боку» — ось наклонена на 98°.</p></div>
+      <div class="card" data-name="нептун"><span class="tag">Ледяной гигант</span><div class="grad-title">Нептун</div><p>Самая дальняя планета. Ветра до 2100 км/ч.</p></div>
+    </div>
+  </div>
+
+  <!-- ====== FAQ ====== -->
+  <div class="page" id="page-faq">
+    <h1>Вопросы и ответы</h1>
+    <p>Несколько популярных вопросов о космосе.</p>
+    <div class="acc">
+      <div class="acc-item">
+        <button class="acc-h">Сколько лет вселенной? <span class="acc-arrow">▾</span></button>
+        <div class="acc-body"><div class="acc-inner">Около 13,8 миллиарда лет — такова оценка на основе реликтового излучения.</div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-h">Сколько галактик существует? <span class="acc-arrow">▾</span></button>
+        <div class="acc-body"><div class="acc-inner">По современным данным — от 200 млрд до 2 трлн в наблюдаемой вселенной.</div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-h">Есть ли жизнь на других планетах? <span class="acc-arrow">▾</span></button>
+        <div class="acc-body"><div class="acc-inner">Достоверных доказательств нет, но с учётом числа планет большинство учёных считают это вероятным.</div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-h">Что будет с Солнцем? <span class="acc-arrow">▾</span></button>
+        <div class="acc-body"><div class="acc-inner">Примерно через 5 млрд лет Солнце превратится в красный гигант, а затем — в белый карлик.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== КОНТАКТЫ ====== -->
+  <div class="page" id="page-contact">
+    <h1>Контакты</h1>
+    <p>Есть вопрос или хотите предложить тему? Напишите нам.</p>
+    <form class="form" id="cForm">
+      <div class="fg">
+        <label>Имя</label>
+        <input type="text" placeholder="Ваше имя"/>
+      </div>
+      <div class="fg">
+        <label>Email</label>
+        <input type="email" placeholder="email@example.com"/>
+      </div>
+      <div class="fg">
+        <label>Сообщение</label>
+        <textarea placeholder="Ваш вопрос..."></textarea>
+      </div>
+      <button class="btn-shiny" type="submit">Отправить</button>
+      <div class="ok-msg" id="okMsg">Сообщение отправлено!</div>
+    </form>
+  </div>
+
+</main>
+
+<footer>© 2026 Cosmos · Сделано Усмановой Лилией</footer>
+<button id="topBtn" title="Наверх">↑</button>
+
+<script>
+/* НАВИГАЦИЯ */
+function navigate(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nl').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelector('[data-p="' + id + '"]').classList.add('active');
+  window.scrollTo({ top: 0 });
+  if (id === 'home') startTW();
+  activateSlideIns();
+}
+document.querySelectorAll('.nl').forEach(l =>
+  l.addEventListener('click', e => { e.preventDefault(); navigate(l.dataset.p); })
+);
+
+/* ЭЛЕМЕНТ 8: пишущая машинка */
+const twEl = document.getElementById('tw');
+const twStr = 'Вселенная бесконечна';
+let twI = 0, twTimer;
+function startTW() {
+  twEl.textContent = ''; twI = 0; clearInterval(twTimer);
+  twTimer = setInterval(() => {
+    if (twI < twStr.length) twEl.textContent += twStr[twI++];
+    else clearInterval(twTimer);
+  }, 85);
+}
+startTW();
+
+/* ЭЛЕМЕНТ 1: падающие звёзды */
+(function () {
+  const c = document.getElementById('starCanvas');
+  const ctx = c.getContext('2d');
+  let W, H, dots = [], shots = [];
+  function resize() { W = c.width = innerWidth; H = c.height = innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  for (let i = 0; i < 160; i++)
+    dots.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.1 + .2, a: Math.random() * .6 + .25 });
+  function spawn() {
+    shots.push({ x: Math.random() * W * .65, y: Math.random() * H * .4, len: Math.random() * 110 + 60,
+      spd: Math.random() * 5 + 4, p: 0, a: 1 });
+  }
+  spawn(); setInterval(spawn, 2000);
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    dots.forEach(d => {
+      ctx.beginPath(); ctx.arc(d.x * W, d.y * H, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,210,255,${d.a})`; ctx.fill();
+    });
+    shots = shots.filter(s => s.a > 0);
+    shots.forEach(s => {
+      const ang = Math.PI / 4;
+      const ex = s.x + Math.cos(ang) * s.len * s.p;
+      const ey = s.y + Math.sin(ang) * s.len * s.p;
+      const g = ctx.createLinearGradient(s.x, s.y, ex, ey);
+      g.addColorStop(0, 'rgba(180,160,255,0)');
+      g.addColorStop(.7, `rgba(200,180,255,${s.a * .7})`);
+      g.addColorStop(1, `rgba(255,255,255,${s.a})`);
+      ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(ex, ey);
+      ctx.strokeStyle = g; ctx.lineWidth = 1.4; ctx.stroke();
+      s.p += s.spd / s.len * .06;
+      if (s.p > 1) s.a -= .06;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ЭЛЕМЕНТ 9: скользящее появление */
+function activateSlideIns() {
+  setTimeout(() => {
+    document.querySelectorAll('.page.active .slide-in').forEach((el, i) =>
+      setTimeout(() => el.classList.add('on'), i * 110)
+    );
+  }, 50);
+}
+activateSlideIns();
+
+/* ЭЛЕМЕНТ 5: тумблер */
+document.getElementById('tog').addEventListener('change', function () {
+  document.getElementById('planetsGrid').classList.toggle('list-mode', this.checked);
+});
+
+/* ЭЛЕМЕНТ 2: поиск планет */
+document.getElementById('srch').addEventListener('input', function () {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('#planetsGrid .card').forEach(c => {
+    c.style.display = c.dataset.name.includes(q) ? '' : 'none';
+  });
+});
+
+/* АККОРДЕОН */
+document.querySelectorAll('.acc-h').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const it = btn.closest('.acc-item'), open = it.classList.contains('open');
+    document.querySelectorAll('.acc-item').forEach(i => {
+      i.classList.remove('open'); i.querySelector('.acc-body').style.maxHeight = '0';
+    });
+    if (!open) {
+      it.classList.add('open');
+      it.querySelector('.acc-body').style.maxHeight = it.querySelector('.acc-inner').scrollHeight + 'px';
+    }
+  });
+});
+
+/* ФОРМА */
+document.getElementById('cForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const m = document.getElementById('okMsg');
+  m.style.display = 'block'; e.target.reset();
+  setTimeout(() => m.style.display = 'none', 3500);
+});
+
+/* КНОПКА НАВЕРХ */
+const tb = document.getElementById('topBtn');
+window.addEventListener('scroll', () => tb.classList.toggle('show', scrollY > 180));
+tb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+</body>
+</html>
