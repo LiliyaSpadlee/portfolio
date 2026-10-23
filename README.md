@@ -1,6 +1,7 @@
 Работы: <br>
 https://liliyaspadlee.github.io/portfolio/ <br>
-https://liliyaspadlee.github.io/portfolio/cosmos.html
+https://liliyaspadlee.github.io/portfolio/cosmos.html <br>
+https://liliyaspadlee.github.io/portfolio/BINGO/
 
 Библиотечная система
 Информационная система управления библиотечной сетью, сотрудниками, книжными фондами и поставками литературы.
